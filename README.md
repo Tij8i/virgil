@@ -29,17 +29,32 @@ claude                                          # opens Claude Code
 virgil/
 ├── CLAUDE.md              # Agent identity — loaded automatically by Claude Code
 ├── CONTRACT.md            # Performance contract (V = items successfully put through / cycle)
-├── skills/                # /start, /wrap-up, /correct, /score
+├── workflows/             # The product catalog — what Virgil does for you
+│   ├── capture-and-route/ # Built-in: turn messy inputs into a structured idea system
+│   └── progress-diary/    # Optional (v1.2): keep a diary of progress toward what matters
+├── skills/                # Invokable commands: /start, /wrap-up, /correct, /score
 ├── config/                # Your instance config (gitignored — use .example templates)
 ├── dashboard/             # Per-instance performance dashboard
 │   ├── index.html         # Open in any browser to view your Virgil's metrics
 │   └── dashboard-data.example.js  # Schema reference + first-run preview
 ├── docs/
 │   ├── SETUP.md           # Full setup guide
+│   ├── WORKFLOWS.md       # What a workflow is + how to write your own
 │   └── OPTIMIZATION_FUNCTION_v1.md  # KPI spec, image formula
 └── scripts/
     └── soft-test.sh       # Verify your install is working
 ```
+
+## What Virgil does for you — workflows
+
+A **workflow** is a product Virgil ships with a clear use case, user journey, and outcome. The value of Virgil lives in its workflows — everything else (channels, skills, integrations, dashboard) is supporting infrastructure.
+
+| Workflow | Status |
+|---|---|
+| [**Capture & Route**](workflows/capture-and-route/) — turn messy inputs into a structured idea system | 🟢 Built-in, active |
+| [**Progress Diary**](workflows/progress-diary/) — keep a coherent diary of progress | 🟡 Designed (v1.2) |
+
+More workflows graduate into the core as users build and contribute them. See [docs/WORKFLOWS.md](docs/WORKFLOWS.md) for the format + how to write your own.
 
 ## Performance dashboard
 

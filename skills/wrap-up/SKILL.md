@@ -89,6 +89,7 @@ After step 4 (and after 4b if it ran), update `dashboard/dashboard-data.js` with
 - Recompute the 6 diagnostic objective KPIs from `config/routing-decisions.log`, `config/corrections.log`, the vault, and Notion queries. For each: `current` value + a `severity` of `good`/`warn`/`bad` based on whether it meets the target. Optional `note` if there's a one-line diagnostic worth surfacing (e.g., "2 tasks missing Area").
 - Append today's session summary to `recent_sessions` at the top (`{date, summary, items_routed, items_corrected}`). Keep last 10 entries.
 - Leave the 4 diagnostic judgment KPIs as `current: "needs review"` — these require manual periodic review by the user, not auto-computation.
+- Populate `workflows.registered` by reading each `workflows/*/workflow.json` in the repo. For each: emit `{id, name, category, status, tagline, primary_metric}`. For the active `capture-and-route` workflow, set `primary_metric` to `{name: "V", value: <current V>, trend: <up/down/flat/baseline>}`. For non-active workflows, set `primary_metric: null`.
 
 **At cycle end** (only when step 4b ran):
 - Update `primary_kpi.current_value` with the newly computed V.

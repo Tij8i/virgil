@@ -1,0 +1,37 @@
+{
+  "id": "capture-and-route",
+  "name": "Capture & Route",
+  "version": "1.0.0",
+  "category": "built-in",
+  "status": "active",
+  "tagline": "Turn messy inputs into a structured idea system.",
+  "for_whom": "Anyone with too many inputs and not enough structure — thinkers, builders, parents, operators.",
+  "outcome": "Every input lands in the right place. Tasks go to your task manager. Ideas to your knowledge base. Completions to your daily log. Nothing dropped, nothing lost.",
+  "user_journey": [
+    "Throw items at Virgil through any channel during the day (TUI, Telegram, scratchpad)",
+    "Virgil labels each item and routes it: tasks to your task manager, ideas to your archive, completions to your daily log",
+    "At end of day, /wrap-up closes out and posts a recap",
+    "At end of cycle, V (items successfully put through) is reported"
+  ],
+  "skills": ["start", "wrap-up", "correct", "score"],
+  "metrics": {
+    "primary": {
+      "name": "V",
+      "description": "items successfully put through per cycle"
+    },
+    "diagnostic": [
+      "capture_rate",
+      "queue_at_start",
+      "task_metadata_completeness",
+      "archive_linking_rate",
+      "daily_note_coverage",
+      "deduplication"
+    ]
+  },
+  "triggers": ["on_demand"],
+  "dependencies": {
+    "vault": "Required — Obsidian-compatible markdown folder",
+    "task_manager": "Required — Notion (default) or any task manager with an API",
+    "mcps": ["notion"]
+  }
+}

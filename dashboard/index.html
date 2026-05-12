@@ -171,23 +171,63 @@
     border-radius: 8px;
   }
   .placeholder b { color: var(--text); font-weight: 500; }
-  .workflow-row {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.875rem;
+  .workflow-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.625rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.875rem;
+    align-items: start;
   }
-  .workflow-row:last-child { border-bottom: none; }
+  .workflow-card:last-child { margin-bottom: 0; }
+  .workflow-card.inactive { opacity: 0.7; background: var(--bg); }
   .dot {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     flex-shrink: 0;
+    margin-top: 6px;
   }
-  .dot.active { background: var(--good); box-shadow: 0 0 6px rgba(16,185,129,0.4); }
-  .dot.inactive { background: var(--muted); opacity: 0.3; }
+  .dot.active { background: var(--good); box-shadow: 0 0 8px rgba(16,185,129,0.5); }
+  .dot.designed { background: var(--warn); }
+  .dot.inactive { background: var(--muted); opacity: 0.4; }
+  .workflow-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .workflow-tagline {
+    color: var(--muted);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+  .workflow-meta {
+    text-align: right;
+    font-size: 0.8rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .workflow-meta .metric-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent);
+    display: block;
+  }
+  .category-tag {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .category-tag.built-in { background: rgba(79,70,229,0.08); border-color: var(--accent); color: var(--accent); }
   .empty-state {
     text-align: center;
     padding: 4rem 1rem;
@@ -360,25 +400,38 @@ function render() {
       html += '</section>';
     }
 
-    // Workflows (placeholder for v1.1 #4)
-    html += '<section><h2>Workflows <span class="badge">v1.1</span></h2>';
+    // Workflows — the product catalog
+    html += '<section><h2>Workflows</h2>';
     if (agent.workflows && agent.workflows.registered && agent.workflows.registered.length) {
       agent.workflows.registered.forEach(function(w) {
-        html += '<div class="workflow-row">';
-        html += '<span class="dot ' + (w.active ? 'active' : 'inactive') + '"></span>';
-        html += '<span>' + escapeHtml(w.name) + '</span>';
-        html += '<span class="session-meta">' + escapeHtml(w.description || '') + '</span>';
+        var dotClass = w.status === 'active' ? 'active' : (w.status === 'designed_not_implemented' ? 'designed' : 'inactive');
+        var cardClass = w.status === 'active' ? '' : 'inactive';
+        var statusLabel = w.status === 'active' ? '' :
+                         (w.status === 'designed_not_implemented' ? 'designed · v1.2' : escapeHtml(w.status));
+        html += '<div class="workflow-card ' + cardClass + '">';
+        html += '<span class="dot ' + dotClass + '"></span>';
+        html += '<div>';
+        html += '<div class="workflow-name">' + escapeHtml(w.name);
+        if (w.category) html += '<span class="category-tag ' + escapeHtml(w.category) + '">' + escapeHtml(w.category.replace('_', ' ')) + '</span>';
+        html += '</div>';
+        html += '<div class="workflow-tagline">' + escapeHtml(w.tagline || '') + '</div>';
+        html += '</div>';
+        html += '<div class="workflow-meta">';
+        if (w.primary_metric) {
+          html += '<span class="metric-value">' + escapeHtml(String(w.primary_metric.value)) + '</span>';
+          html += escapeHtml(w.primary_metric.name);
+          if (w.primary_metric.trend) html += ' · ' + escapeHtml(w.primary_metric.trend);
+        } else {
+          html += statusLabel;
+        }
+        html += '</div>';
         html += '</div>';
       });
     } else {
-      html += '<div class="placeholder"><b>No workflows registered yet.</b><br>Workflow registry ships in v1.1 (item #4).</div>';
+      html += '<div class="placeholder"><b>No workflows registered yet.</b></div>';
     }
     html += '</section>';
 
-    // Session-type breakdown (placeholder for v1.1 #4)
-    html += '<section><h2>Session type breakdown <span class="badge">v1.1</span></h2>';
-    html += '<div class="placeholder">Pie chart of workflow vs general sessions — depends on workflow registry (v1.1 item #4).</div>';
-    html += '</section>';
   });
 
   html += '<footer>Virgil dashboard v0 · <a href="https://github.com/Tij8i/virgil">github.com/Tij8i/virgil</a></footer>';

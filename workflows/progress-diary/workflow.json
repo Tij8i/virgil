@@ -1,0 +1,27 @@
+{
+  "id": "progress-diary",
+  "name": "Progress Diary",
+  "version": "0.0.0",
+  "category": "optional",
+  "status": "designed_not_implemented",
+  "tagline": "Keep a coherent diary of progress toward what matters.",
+  "for_whom": "Anyone who wants to see their trajectory across days, weeks, and months — not just today.",
+  "outcome": "Diary entries appear automatically, linked to goals, with weekly and monthly reflection prompts.",
+  "user_journey": [
+    "On /wrap-up, Virgil drafts a diary entry: today's wins, what advanced, what got blocked",
+    "User reviews + edits the draft (low friction — accept, edit, or skip)",
+    "Weekly: Virgil prompts a longer reflection synthesizing the week",
+    "Monthly: Virgil surfaces patterns and trajectory across recent weeks"
+  ],
+  "skills": [],
+  "metrics": {
+    "primary": null,
+    "diagnostic": []
+  },
+  "triggers": ["on_wrap_up", "scheduled"],
+  "dependencies": {
+    "vault": "Required — for diary entries",
+    "goals_db": "Recommended — for linking entries to goals"
+  },
+  "roadmap": "Implementation planned for v1.2. Open a discussion or PR if you want to help shape the design."
+}

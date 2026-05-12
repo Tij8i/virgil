@@ -42,7 +42,24 @@ window.__VIRGIL_DASHBOARD__ = {
         { date: "2026-05-10", summary: "Heavy reflection day", items_routed: 6, items_corrected: 1 }
       ],
       workflows: {
-        registered: []
+        registered: [
+          {
+            id: "capture-and-route",
+            name: "Capture & Route",
+            category: "built-in",
+            status: "active",
+            tagline: "Turn messy inputs into a structured idea system.",
+            primary_metric: { name: "V", value: 14, trend: "baseline" }
+          },
+          {
+            id: "progress-diary",
+            name: "Progress Diary",
+            category: "optional",
+            status: "designed_not_implemented",
+            tagline: "Keep a coherent diary of progress toward what matters.",
+            primary_metric: null
+          }
+        ]
       }
     }
   ]
