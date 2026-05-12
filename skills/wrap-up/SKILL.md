@@ -76,7 +76,30 @@ Reminder: V is the primary KPI per CONTRACT.md. Sunset to a quality KPI when V p
 
 3. If the cycle is **cycle 1 or 2** (baseline), drop the trend line and replace with: `Baseline cycle (cycle <N> of 2 — no trend comparison yet).`
 
-This ties the daily note to the performance contract per `CONTRACT.md`. Once the dashboard surface (separate Architect task) is built, V values get aggregated there too — but the daily note remains the canonical first-write surface.
+This ties the daily note to the performance contract per `CONTRACT.md`. The dashboard surface (`dashboard/index.html`) aggregates V values too — see step 4c below — but the daily note remains the canonical first-write surface.
+
+### 4c. Update dashboard data
+
+After step 4 (and after 4b if it ran), update `dashboard/dashboard-data.js` with the current state. This is the data file consumed by `dashboard/index.html`.
+
+**Format**: a single JS assignment `window.__VIRGIL_DASHBOARD__ = { ... }`. Schema: see `dashboard/dashboard-data.example.js`.
+
+**Every wrap-up**:
+- Bump `last_updated` to now (ISO 8601 datetime), `cycle` to current ISO week.
+- Recompute the 6 diagnostic objective KPIs from `config/routing-decisions.log`, `config/corrections.log`, the vault, and Notion queries. For each: `current` value + a `severity` of `good`/`warn`/`bad` based on whether it meets the target. Optional `note` if there's a one-line diagnostic worth surfacing (e.g., "2 tasks missing Area").
+- Append today's session summary to `recent_sessions` at the top (`{date, summary, items_routed, items_corrected}`). Keep last 10 entries.
+- Leave the 4 diagnostic judgment KPIs as `current: "needs review"` — these require manual periodic review by the user, not auto-computation.
+
+**At cycle end** (only when step 4b ran):
+- Update `primary_kpi.current_value` with the newly computed V.
+- Append `{cycle, value}` to `primary_kpi.history`.
+- Set `is_baseline: true` if cycle index ≤ 2; else false.
+- Update `trend` (`up`/`down`/`flat`) and `trend_label` (one-line, e.g. "↑ +3 vs prior cycle"). For baseline cycles, set `trend_label: "baseline cycle — no trend until cycle 3"`.
+- Update `note` with a one-line diagnostic if relevant.
+
+**Write atomically** — overwrite the entire file content (don't append). The user just opens `dashboard/index.html` in any browser to view.
+
+If the file write fails (path missing, permissions), log to `_notion_queue.md` with prefix `[Dashboard write]` and continue.
 
 ### 5. Post daily recap to Notion
 

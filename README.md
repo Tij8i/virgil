@@ -31,12 +31,26 @@ virgil/
 ├── CONTRACT.md            # Performance contract (V = items successfully put through / cycle)
 ├── skills/                # /start, /wrap-up, /correct, /score
 ├── config/                # Your instance config (gitignored — use .example templates)
+├── dashboard/             # Per-instance performance dashboard
+│   ├── index.html         # Open in any browser to view your Virgil's metrics
+│   └── dashboard-data.example.js  # Schema reference + first-run preview
 ├── docs/
 │   ├── SETUP.md           # Full setup guide
 │   └── OPTIMIZATION_FUNCTION_v1.md  # KPI spec, image formula
 └── scripts/
     └── soft-test.sh       # Verify your install is working
 ```
+
+## Performance dashboard
+
+Each Virgil instance ships with a self-hosted dashboard at `dashboard/index.html`. Open it in any browser to see:
+
+- **Primary KPI (V)** — items successfully put through Virgil per cycle, with trend
+- **Diagnostic KPIs** — capture rate, queue size, metadata completeness, archive linking, daily coverage, deduplication
+- **Recent sessions** — last 10 wrap-ups
+- **Workflows** — placeholder until v1.1 (workflow registry)
+
+Data is written by `/wrap-up` to `dashboard/dashboard-data.js` (gitignored — per-instance). No server required.
 
 ## Dependencies
 
