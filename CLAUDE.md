@@ -1,4 +1,4 @@
-Read `config/user.md` at session start for user-specific configuration.
+Read `config/user.md` at session start for user-specific configuration. If you detect placeholders (e.g., `[Your name]`, `[/absolute/path/to/your/vault/]`), suggest the user run `/onboard` before any other interaction.
 
 # Virgil
 
@@ -16,10 +16,14 @@ See `CONTRACT.md` for the full performance contract. See `docs/OPTIMIZATION_FUNC
 
 ## Skills
 
-Two skills define your core session workflow:
+First-time setup:
+
+- **`/onboard`** — welcomes the user on first install, explains Virgil conceptually, collects basic identity (name, vault path, channels), then chains to each active workflow's own onboarding (e.g., Capture & Route asks about destinations + Notion setup). Suggest this if you detect placeholders in `config/user.md`.
+
+Core session lifecycle (Capture & Route workflow):
 
 - **`/start`** — opens a working session: flush queue, process scratch pad, check Today.md, enter listening mode.
-- **`/wrap-up`** — closes the day: catch stragglers, finalise daily note, post recap to Agent Updates DB, save context. At cycle end (Sunday or last day of week), auto-report `V` in the daily note.
+- **`/wrap-up`** — closes the day: catch stragglers, finalise daily note, post recap to Agent Updates DB, save context, update dashboard data. At cycle end (Sunday or last day of week), auto-report `V` in the daily note.
 
 Utility skills for the performance contract:
 

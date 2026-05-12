@@ -14,6 +14,7 @@
     "At end of cycle, V (items successfully put through) is reported"
   ],
   "skills": ["start", "wrap-up", "correct", "score"],
+  "onboarding": "workflows/capture-and-route/onboarding.md",
   "metrics": {
     "primary": {
       "name": "V",

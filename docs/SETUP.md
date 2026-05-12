@@ -11,13 +11,19 @@ Virgil is a personal OS agent — it captures everything you throw at it (tasks,
 - Claude Code (Phase 0) or NanoClaw (Phase 1+)
 - An LLM API key (Claude recommended)
 
-## Quick Start (Phase 0 — Claude Code)
+## Quick Start (Claude Code)
 
 1. Clone this repo
-2. Copy `config/user.md.example` to `config/user.md` and fill in your personal data
-3. Set up your Notion MCP server in `.claude/settings.local.json`
-4. Open Claude Code in this directory
-5. Run `/start` to begin a session
+2. Copy the templates:
+   ```bash
+   cp config/user.md.example config/user.md
+   cp config/memory.md.example config/memory.md
+   cp config/connectors.md.example config/connectors.md
+   cp .mcp.json.example .mcp.json
+   ```
+3. Open Claude Code in this directory: `claude`
+4. **Run `/onboard`** — Virgil walks you through configuring everything (identity, vault path, workflow-specific setup like Notion DB IDs). Takes ~10 minutes.
+5. Run `/start` to begin your first session.
 
 ## Directory Structure
 
