@@ -1,0 +1,43 @@
+# Virgil — Setup Guide
+
+## What is Virgil?
+
+Virgil is a personal OS agent — it captures everything you throw at it (tasks, ideas, observations, completions, kids notes, groceries) and routes each item to the right place. It runs daily via two commands: `/start` (open session) and `/wrap-up` (close day).
+
+## Prerequisites
+
+- An Obsidian vault (or any markdown-based note system)
+- A Notion workspace with Task Planner and Agent Updates databases
+- Claude Code (Phase 0) or NanoClaw (Phase 1+)
+- An LLM API key (Claude recommended)
+
+## Quick Start (Phase 0 — Claude Code)
+
+1. Clone this repo
+2. Copy `config/user.md.example` to `config/user.md` and fill in your personal data
+3. Set up your Notion MCP server in `.claude/settings.local.json`
+4. Open Claude Code in this directory
+5. Run `/start` to begin a session
+
+## Directory Structure
+
+```
+vigil/
+├── CLAUDE.md              # Agent identity — loaded automatically
+├── skills/                # Portable skill definitions (canonical)
+│   ├── start/SKILL.md     # /start command
+│   └── wrap-up/SKILL.md   # /wrap-up command
+├── config/                # Instance config (personal, not published)
+│   ├── user.md            # Your Notion IDs, people, areas
+│   ├── memory.md          # Cross-session context
+│   └── connectors.md      # Output routing bindings
+└── docs/
+    └── SETUP.md           # This file
+```
+
+## Customisation
+
+- **Area detection**: Edit `config/user.md` Area Detection Rules to match your life domains
+- **Labels**: Edit `config/memory.md` Labels section to match your note categories
+- **Output routing**: Edit `config/connectors.md` to change where outputs go (Notion, email, WhatsApp, etc.)
+- **People**: Add your contacts to `config/user.md` People section for auto-detection

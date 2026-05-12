@@ -1,0 +1,45 @@
+# Virgil — Output Connectors
+
+> **Setup**: copy this file to `config/connectors.md` and customize if you want to change where Virgil's outputs go.
+> ```bash
+> cp config/connectors.md.example config/connectors.md
+> ```
+
+Defines where Virgil's outputs are routed. Each output has a default destination that can be reconfigured per-instance.
+
+---
+
+## Output Contracts
+
+| Output | Description | Default Destination | Binding |
+|--------|------------|-------------------|---------|
+| Daily Recap | End-of-day summary of wins, themes, carry-overs | Agent Updates DB (Notion) | `mcp__notion__API-post-page` with data_source_id from `user.md` |
+| Task Creation | New tasks routed from input | Task Planner (Notion) | Local MCP `API-post-page` or curl fallback |
+| Task Completion | Marking tasks as Done | Task Planner (Notion) | Local MCP `API-patch-page` or curl fallback |
+| Daily Note | Raw capture log + curated narrative | Vault `Daily Notes/YYYY-MM-DD.md` | Filesystem write |
+| Archive Note | Labelled, processed notes | Vault `Archive/` | Filesystem write |
+| Knowledge Graph | Concept extraction from Writings/Thoughts | Optional separate vault + Ideas DB | Filesystem + Notion |
+| Fallback Queue | Failed task-manager API calls | Vault `_notion_queue.md` | Filesystem write |
+
+---
+
+## How to Reconfigure
+
+To change where an output goes (e.g., daily recap via email instead of Notion):
+
+1. Update the binding in this file.
+2. Ensure the target MCP server or API is available in `.mcp.json` (referenced from `user.md`).
+3. Update the relevant `skills/<name>/SKILL.md` step that produces the output.
+
+The skill files reference `config/connectors.md` for routing decisions. The skills define *what* is produced; this file defines *where* it goes.
+
+---
+
+## Alternative destinations (examples)
+
+| Output | Alternative | What you'd need |
+|--------|-------------|-----------------|
+| Daily Recap | Email | SMTP server config or an email-MCP |
+| Task Creation | Any task manager (Todoist, Linear, Things) | That tool's API + an MCP wrapper |
+| Daily Note | Any markdown folder (Obsidian, Logseq, plain folder) | Just a filesystem path |
+| Knowledge Graph | Disable entirely | Remove the Knowledge Distillation Pipeline section from `memory.md` |

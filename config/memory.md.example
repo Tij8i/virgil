@@ -1,0 +1,167 @@
+# Virgil — Operational Memory
+
+> **Setup**: copy this file to `config/memory.md` and customize for your own labels and routing rules.
+> ```bash
+> cp config/memory.md.example config/memory.md
+> ```
+
+Cross-session context. Read at session start, updated at session close.
+
+---
+
+## Labelling System
+
+Notes from `Scratch_Pad/` are parsed, segmented (a single file may contain multiple items), and labelled during `/start`. Labelled notes are filed to `Archive/` as individual `.md` files. Tasks are routed to your task manager (see `config/user.md`).
+
+### Default labels (customize for your life)
+
+- **Lists** — reference lists that grow over time (e.g., books to read, restaurants to try). Kept as living documents.
+- **Tasks** — action items and to-dos. Route to your task manager with Status: Inbox, Source: Virgil, Area if detectable.
+- **Completed Tasks** — items you've done. Mark as Done in your task manager and record as daily wins in the daily note.
+- **Goals** — weekly/monthly goals. Route to your Goals DB. Store in memory.md for reference.
+- **Writings/Thoughts** — personal reflections, ideas, observations. Processed through the **Knowledge Distillation Pipeline** (see below).
+- **Personal Development** — structured self-work: identity exercises, vision-building, growth frameworks.
+- **Groceries** — food/household items to buy → append to `Archive/Shopping list.md`.
+- **Kids — [Name]** — observations, quotes, milestones about a child → append to `Archive/[Name].md` with date and place.
+- **[Your area]** — add labels for your own domains (e.g., "Business - X", "Side project Y", "Hobbies").
+
+---
+
+## Task Routing — Task Manager Integration
+
+**Source of truth for tasks: the task manager configured in `config/user.md`.**
+
+### How Virgil creates tasks
+
+Minimum fields:
+- **Name**: task title
+- **Status**: always `Inbox` (your triage process picks them up from here)
+- **Source**: always `Virgil`
+- **Area**: set if detectable from context (see Area Detection Rules in `user.md`)
+
+Optional metadata (e.g., Importance, Sprint, Project) is not Virgil's job — leave those for your triage process.
+
+### Archive Linking (prevent orphan notes)
+
+When creating a task, **always search the Archive for related notes** before submitting:
+1. Use keywords from the task title, detected Area, and contextual terms to search `Archive/`.
+2. If related notes found, add to task description as "Related vault notes: [names]".
+3. Bidirectional: if filing a new Archive note that relates to an existing task, mention it in `## Related`.
+4. Don't force it — only link genuinely related notes.
+
+### Virgil CAN update task status
+
+When user says "done with X" or "finished Y" during listening mode:
+- Find the task in the task manager and mark Status → `Done`
+- Log as a daily win in the daily note
+
+### Daily Recap → Agent Updates
+
+After writing the daily note during `/wrap-up`, post a copy to the Agent Updates DB (configured in `user.md`) with:
+- **Title**: Short summary line
+- **Source**: `Virgil`
+- **Target**: `[Your triage agent or you]`
+- **Type**: `Daily Recap`
+- **Date**: Today's date
+- **Page content**: The full daily recap text
+
+### Fallback Queue
+
+If the task manager API fails, write to `_notion_queue.md` at vault root.
+Format: `- [Area] Task name | Status: Inbox | Source: Virgil`
+On next `/start`, attempt to flush queued items. Remove successfully synced items.
+
+### Duplicate Detection
+
+Before creating a task, search the task manager for similar titles.
+- In **listening mode**: flag briefly ("This looks similar to 'X' — create anyway?")
+- In **/start processing**: include duplicates in confirmation summary
+
+---
+
+## Knowledge Distillation Pipeline
+
+**Applies ONLY to: Writings/Thoughts label.** All other labels are unaffected. This pipeline is optional — remove this section if you don't want it.
+
+### Architecture
+- **Raw layer**: Ideas database (see `user.md` for ID). Store raw note unchanged with metadata.
+- **Knowledge graph layer**: a separate vault (e.g., Obsidian) for conceptual knowledge graphs — path configurable.
+
+### Node types
+- **C - Title** (`#wt/concept`) — atomic ideas, hypotheses, models, insights.
+- **L - Title** (`#wt/lens`) — interpretation frameworks. Create only when used repeatedly.
+- **H - Title** (`#wt/hub`) — curated maps of related concept clusters. Create conservatively.
+
+### Processing workflow
+1. Store raw note in Ideas DB (Status: Not started → Done after processing)
+2. Extract 2–3 atomic concepts (max 5). Prefer fewer strong ideas over many weak fragments.
+3. Create concept notes using the template below
+4. Link concepts to each other
+5. Assign 0–2 lens nodes per concept
+6. Add development questions, research directions, optional writing seeds
+
+### Concept note template
+```
+# C - Title
+Concept: [clear statement]
+Explanation: [short expansion]
+Status: seed | developing | structured | publishable
+Source: [Raw Note title]
+
+Related Concepts:
+[[C - X]] — [relation explanation]
+
+Lens:
+[[L - X]]
+
+## Development Questions
+- ...
+
+## Research Directions
+- ...
+
+## Writing Seed (optional)
+```
+
+### Quality rules
+- No trivial fragments, no excessive splitting, no keyword-based linking
+- Concept notes must be concise, conceptual, self-contained
+- Duplicate detection: check existing concepts before creating
+
+---
+
+## Interlinking
+
+All vault notes should be connected using `[[wikilinks]]`:
+- **Atomic notes** — each file represents one concept, idea, or task.
+- **Link on creation** — when filing a new note, link it to related existing notes.
+- **Backlink both ways** — if note A links to note B, also add a link from B back to A.
+- **Related section** — use `## Related` at the bottom of notes for thematic connections.
+- **Daily notes link to everything** — daily notes link to all archived notes and tasks they reference.
+- Don't force links. Only link when there's genuine conceptual connection.
+
+---
+
+## Daily Note — Two-Phase Design
+
+### Phase 1 — Live capture (during the day)
+- During listening mode, **every item is immediately appended** to the daily note as a raw bullet.
+- Format: `- [HH:MM] Item description → routing`
+- Purpose: **persistence** — if the session dies, nothing is lost.
+
+### Phase 2 — Curated narrative (during /wrap-up)
+- During `/wrap-up`, the raw capture log is refined into a curated editorial narrative.
+- Lead with **Daily Wins**.
+- Style: themes, areas of focus, tasks moved, editorial take on direction and momentum.
+
+### Session recovery
+- If interrupted, you can resume listening mode without re-running `/start`.
+- Read the daily note to restore context.
+
+---
+
+## Session Log
+
+_Operational session history. Append new entries at the bottom as you use Virgil._
+
+(Empty on first install. Virgil will append session summaries here over time.)

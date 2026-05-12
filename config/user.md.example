@@ -1,0 +1,128 @@
+# Virgil — User Configuration
+
+> **Setup**: copy this file to `config/user.md` and replace bracketed placeholders with your own values.
+> ```bash
+> cp config/user.md.example config/user.md
+> ```
+
+**User**: [Your name]
+**Created**: [YYYY-MM-DD]
+**Last Updated**: [YYYY-MM-DD]
+
+---
+
+## Vault Location
+
+The Obsidian vault (or any markdown folder) is the canonical data store. Virgil reads/writes here but does not own it.
+
+**Path**: `[/absolute/path/to/your/vault/]`
+
+Recommended folder structure inside the vault:
+
+```
+[vault]/
+├── Scratch_Pad/          — inbox (unprocessed top, pending bottom)
+├── Archive/              — labelled, processed notes
+├── Daily Notes/          — YYYY-MM-DD.md (capture log → curated narrative)
+├── Meetings/             — transcripts and meeting notes
+├── Today.md              — daily to-dos
+└── _notion_queue.md      — fallback queue for failed task-manager syncs
+```
+
+---
+
+## Tools & Integrations
+
+### Task Manager: Notion (default)
+
+Virgil's default task manager is Notion. You can swap it for any task manager with an API (see `config/connectors.md.example`).
+
+**Databases (FRAGILE — IDs break if the DB is moved or recreated)**
+
+| Database | Data Source ID | DB ID (for curl) |
+|---|---|---|
+| Task Planner | `collection://[your-data-source-id]` | `[your-database-id]` |
+| Goals & Projects | `collection://[your-data-source-id]` | |
+| Weekly Sprints | `collection://[your-data-source-id]` | |
+| Agent Updates | `collection://[your-data-source-id]` | `[your-database-id]` |
+| Ideas (Raw Archive) | `collection://[your-data-source-id]` | |
+
+Remove rows you don't use; add rows for additional DBs you do.
+
+**How to find a Notion ID**: open the database in browser, copy the 32-character string from the URL.
+
+### API Access Patterns
+
+**Credentials**: Notion API token is in `.mcp.json` (gitignored). See `.mcp.json.example` for the format. Never hardcode tokens in skill files or any tracked config.
+
+**Filtered database queries → direct curl (fastest)**:
+```
+curl -s -X POST 'https://api.notion.com/v1/databases/{db_id}/query' \
+  -H 'Authorization: Bearer $NOTION_TOKEN' \
+  -H 'Notion-Version: 2022-06-28' \
+  -H 'Content-Type: application/json' \
+  -d '{"filter":{"property":"Status","select":{"equals":"Inbox"}}}'
+```
+- Use `"select"` (not `"status"`) for Status filter.
+
+**Local Notion MCP** (`mcp__notion__`): `API-post-page`, `API-patch-page`, `API-post-search` work. `API-query-data-source` may be unreliable depending on server version — fall back to curl if it fails.
+
+---
+
+## Area Detection Rules
+
+Edit this table to match the domains of your life. Each row maps keywords or context cues to an area tag that Virgil uses when filing tasks.
+
+| Keywords / context | Area |
+|---|---|
+| work, project-name, colleague-names | 💼 Work |
+| family, partner-name, kids names | 👨‍👩‍👧‍👦 Family |
+| house, repair, garden, plumber | 🏠 Home |
+| career, CV, job application, networking | 💼 Career |
+| personal, self, health, admin | 🧑 Personal |
+| **No clear match → leave Area blank** | |
+
+Replace these rows with the areas in your own life. Add as many as you need.
+
+---
+
+## Children
+
+If applicable, list the children whose notes Virgil should auto-route to dedicated index files.
+
+| Name | Also called | Index file |
+|------|------------|-----------|
+| [Child name] | [Nickname] | `Archive/[Child name].md` |
+
+Remove this section entirely if not applicable.
+
+---
+
+## People
+
+People Virgil should recognize. Used for auto-tagging notes and tasks.
+
+- **[Name]** — [Role / context]
+- **[Name]** — [Role / context]
+
+---
+
+## Inter-Agent Communication
+
+| Agent | Role | Location |
+|-------|------|----------|
+| Virgil | This agent — captures, organises, routes, enriches. Owns vault interaction. | This repo |
+
+If you run other agents alongside Virgil, list them here.
+
+---
+
+## Preferences
+
+Defaults. Override as you prefer.
+
+- Task statuses: Inbox → Backlog → Up Next → Today → In Progress → Done (also: Archived, Cancelled, Paused, Monitoring)
+- Monitoring tasks: require a Review By date (default 2 weeks, hard 6-month cap)
+- Notion query rule: use `data_source_id` (not `database_id`) when calling `API-query-data-source`. Use `database_id` for `retrieve-a-database`.
+- Notion `page_size` max 30 — silent truncation above this. Use `has_more` + `next_cursor` for pagination.
+- Agent Updates DB: title property is "Title" not "Name" (Notion default).
