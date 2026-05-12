@@ -2,6 +2,7 @@
 // Shape: { agents: [ { id, name, last_updated, cycle, primary_kpi, diagnostic_*, recent_sessions, workflows } ] }
 window.__VIRGIL_DASHBOARD__ = {
   schema_version: 1,
+  is_example: true,
   agents: [
     {
       id: "virgil",

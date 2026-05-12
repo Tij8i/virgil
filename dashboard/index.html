@@ -218,22 +218,19 @@
 <body>
 <div id="app">
   <div class="empty-state">
-    <h2>No dashboard data yet</h2>
-    <p>Run <code>/wrap-up</code> in Virgil at the end of a session to populate this dashboard.</p>
+    <h2>Loading…</h2>
+    <p>If you see this for more than a moment, run <code>/wrap-up</code> in Virgil to populate the dashboard.</p>
     <p style="margin-top: 1rem;">First time? See <a href="../docs/SETUP.md">SETUP.md</a>.</p>
   </div>
 </div>
 
-<script src="dashboard-data.js" onerror="loadFallback()"></script>
+<!-- Load order: example first (always exists, marks itself), then real (overrides if exists) -->
+<script src="dashboard-data.example.js"></script>
+<script src="dashboard-data.js"></script>
 <script>
-function loadFallback() {
-  // dashboard-data.js doesn't exist yet — try the example to give first-run users a preview
-  var s = document.createElement('script');
-  s.src = 'dashboard-data.example.js';
-  s.onerror = function() { window.__VIRGIL_DASHBOARD__ = null; render(); };
-  s.onload = function() { window.__VIRGIL_DASHBOARD__.is_example = true; render(); };
-  document.head.appendChild(s);
-}
+// By now both load attempts have completed (synchronous parsing).
+// If dashboard-data.js exists, it overrode the example. If not, the example data remains.
+// The is_example flag distinguishes them — example sets true, real sets false.
 
 function fmtCycle(c) { return c || '—'; }
 function fmtDate(d) {
@@ -290,12 +287,13 @@ function kpiSeverity(kpi) {
 function render() {
   var data = window.__VIRGIL_DASHBOARD__;
   if (!data || !data.agents || !data.agents.length) {
-    return; // empty state already shown
+    document.getElementById('app').innerHTML = '<div class="empty-state"><h2>No dashboard data yet</h2><p>Run <code>/wrap-up</code> in Virgil to populate this dashboard.</p></div>';
+    return;
   }
 
   var html = '';
   if (data.is_example) {
-    html += '<div style="background: var(--bg); border: 1px dashed var(--border); border-radius: 8px; padding: 0.5rem 0.75rem; margin-bottom: 1rem; font-size: 0.8rem; color: var(--muted);">Showing <b style="color:var(--text)">example data</b> — run <code>/wrap-up</code> to see your own metrics.</div>';
+    html += '<div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 0.625rem 0.875rem; margin-bottom: 1rem; font-size: 0.85rem; color: #92400e;"><b>⚠️ EXAMPLE DATA — not your real Virgil metrics.</b> Run <code style="background: rgba(0,0,0,0.05); padding: 1px 6px; border-radius: 4px;">/wrap-up</code> in Virgil to generate your own <code>dashboard-data.js</code>.</div>';
   }
 
   data.agents.forEach(function(agent) {
@@ -388,10 +386,8 @@ function render() {
   document.getElementById('app').innerHTML = html;
 }
 
-// Try to render with whatever loaded
-window.addEventListener('load', function() {
-  if (window.__VIRGIL_DASHBOARD__) render();
-});
+// Render now — both data scripts have already attempted to load by this point
+render();
 </script>
 </body>
 </html>
