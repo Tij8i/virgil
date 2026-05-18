@@ -9,6 +9,14 @@ Triggered when the user fires `/correct [item-reference] [reason]`. The reason i
 
 This skill is the user's signal that Virgil's routing or sizing decision was wrong. It feeds the `V` denominator: a "successfully put through" item is one with **no** correction entry in the cycle (`CONTRACT.md` and `docs/OPTIMIZATION_FUNCTION_v1.md`).
 
+## ⚠️ Non-Negotiable
+
+**Step 2 (append to `config/corrections.log`) MUST execute and succeed before Step 3 (apply the fix) or Step 4 (acknowledge) run.**
+
+If Step 2 doesn't write a JSON line to `config/corrections.log`, Virgil's KPI `V` silently inflates — every uncorrected misclassification looks like a success. The whole optimization function depends on this file. The acknowledgement *"Correction logged"* must reflect a real file write, not an intent.
+
+**Append-only invariant**: never delete, edit, or overwrite prior entries in `config/routing-decisions.log` OR `config/corrections.log`. Both files are JSONL append-only. A correction adds a new line to `corrections.log`; it does NOT remove the original from `routing-decisions.log`.
+
 ## Behavior
 
 ### Step 1 — Identify the original item
@@ -20,7 +28,7 @@ Look at `config/routing-decisions.log` (append-only JSONL). Determine which item
 - If multiple plausible matches, ask the user to disambiguate before logging.
 - If the original item can't be identified, do not guess — ask the user for more context.
 
-### Step 2 — Log the correction
+### Step 2 — Log the correction (mandatory)
 
 Append one JSON line to `config/corrections.log` (append-only JSONL):
 
@@ -31,6 +39,8 @@ Append one JSON line to `config/corrections.log` (append-only JSONL):
 **Cycle** = ISO 8601 week of the current timestamp (e.g., `2026-W19`).
 
 If `config/corrections.log` doesn't exist, create it. The file is append-only — never edit prior entries.
+
+**Verification before continuing**: after the write, read the file (`tail -1 config/corrections.log`) and confirm the line you just wrote is present. If the read fails, the write failed — stop here, surface the error, do NOT run Step 3 or Step 4.
 
 ### Step 3 — Optional: act on the correction
 
@@ -47,6 +57,15 @@ If the user only flagged the error without specifying the fix, just log it. Don'
 Short response, no narrative:
 
 > "Logged correction for [item]. [Optional: `Re-routed to <new destination>.` if applied.]"
+
+## Anti-Patterns (observed failures)
+
+The following behaviours have been observed and break the contract. They are NOT acceptable shortcuts.
+
+- **❌ Acknowledging without writing.** Saying *"Correction logged"* when no line was appended to `corrections.log`. This silently inflates `V`. The acknowledgement must reflect a real file write. (Observed 2026-05-18 soft-test cycle W21.)
+- **❌ Deleting the original routing-decisions entry.** When applying a correction (Step 3), the helpful instinct is to "clean up" the original entry so the log shows only the corrected state. Don't. Both entries stay. `/score` needs both to compute `V`. (Observed 2026-05-18: original entry `proj01` was removed when re-routing as `proj02`.)
+- **❌ Re-routing in lieu of logging.** Treating `/correct` as "redo the routing" instead of "record that the routing was wrong + optionally fix it". The correction record is the primary output; the re-route is the side effect.
+- **❌ Skipping Step 2 because Step 3 is more interesting.** Step 3 is optional; Step 2 is not. If only one runs, it must be Step 2.
 
 ## Notes
 
